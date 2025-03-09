@@ -4,6 +4,7 @@ import Task from "../model/Task";
 import Team from "../model/Team";
 import User from "../model/User";
 import {Schema} from "mongoose";
+import moment from "moment-timezone";
 
 const router = Router();
 
@@ -64,19 +65,40 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 /**
- * Get all tasks.
- * GET /api/tasks
+ * Get all tasks for current user due today.
+ * GET /api/tasks/:uid
  */
-router.get("/", async (req: Request, res: Response) => {
+
+router.get("/:uid", async (req: Request, res: Response) => {
   try {
-    const tasks = await Task.find();
+    const {uid} = req.params;
+    if (!uid) return res.status(400).json({message: "User ID is required"});
+
+    const user = await User.findOne({firebaseUid: uid});
+    if (!user) return res.status(404).json({message: "User not found"});
+
+    // Calculate the current time and 24 hours from now
+    const now = new Date();
+    const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    console.log("Current time:", now);
+    console.log("24 hours from now:", twentyFourHoursFromNow);
+
+    // Query tasks due within the next 24 hours
+    const tasks = await Task.find({
+      assignedTo: user._id,
+      dueDate: {
+        $gte: now,
+        $lte: twentyFourHoursFromNow
+      }
+    });
+
     res.json({tasks});
   } catch (error) {
     console.error("Error fetching tasks:", error);
     res.status(500).json({message: "Error fetching tasks", error});
   }
 });
-
 /**
  * Get a single task by ID.
  * GET /api/tasks/:id
@@ -132,6 +154,29 @@ router.put("/:id", async (req: Request, res: Response) => {
         return res.status(403).json({message: "You are not allowed to update this task."});
       }
     }
+  } catch (error) {
+    console.error("Error updating task:", error);
+    res.status(500).json({message: "Error updating task", error});
+  }
+});
+
+// mark task as completed and award points
+// PUT /api/tasks/complete/:taskId
+router.put("/complete/:taskId", async (req: Request, res: Response) => {
+  try {
+    const task = await Task.findById(req.params.taskId);
+    if (!task) return res.status(404).json({message: "Task not found"});
+    // Get user that being assigned the task
+    const user = await User.findById(task.assignedTo);
+    if (!user) return res.status(404).json({message: "User not found"});
+
+    // update task as completed
+    task.isCompleted = true;
+
+    // award points to user
+    user.points += task.points;
+    await user.save();
+    await task.save();
   } catch (error) {
     console.error("Error updating task:", error);
     res.status(500).json({message: "Error updating task", error});
