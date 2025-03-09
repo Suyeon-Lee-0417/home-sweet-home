@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import {connectDB} from "./utils/DBconnection";
 import authRouter from "./routes/auth";
 import teamRoute from "./routes/team";
+import taskRoute from "./routes/task";
 
 dotenv.config();
 
@@ -21,5 +22,6 @@ app.get(`${endpoint}/`, (req, res) => {
 
 app.use(`${endpoint}/auth`, authRouter);
 app.use(`${endpoint}/teams`, teamRoute);
+app.use(`${endpoint}/tasks`, taskRoute);
 
 export default app;
