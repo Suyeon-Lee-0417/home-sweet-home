@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:pineapple/screens/groceries-screen.dart';
 import 'package:pineapple/screens/home-screen.dart';
 import 'package:pineapple/screens/profile-screen.dart';
-
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -35,25 +33,46 @@ class _NavigationState extends State<Navigation> {
         currentIndex: _selectedIndex, // Highlight selected tab
         onTap: _onItemTapped, // Call function when an item is tapped
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.purple, // Active tab color
-        unselectedItemColor: Colors.grey, // Inactive tab color
         backgroundColor: Colors.white, // Bottom bar background
         elevation: 5, // Shadow effect
-        items: const [
+        selectedItemColor: Color.fromARGB(255, 195, 189, 121), // Color for selected item
+        unselectedItemColor: Colors.grey, // Inactive tab color
+        showSelectedLabels: true, // ✅ Show text when selected
+        showUnselectedLabels: true, // ✅ Show text when unselected
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: _buildNavIcon(Icons.shopping_cart, 0),
             label: 'Groceries',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: _buildNavIcon(Icons.home, 1),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: _buildNavIcon(Icons.person, 2),
             label: 'Profile',
           ),
         ],
       ),
+    );
+  }
+
+  // ✅ Custom method to wrap selected icon in a green circle
+  Widget _buildNavIcon(IconData icon, int index) {
+    bool isSelected = _selectedIndex == index;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.all(isSelected ? 10 : 0), // Add padding for selected
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isSelected ? Color.fromARGB(255, 195, 189, 121) : Colors.transparent, // Selected color
+          ),
+          child: Icon(icon, color: isSelected ? Colors.white : Colors.grey, size: 28),
+        ),
+      ],
     );
   }
 }

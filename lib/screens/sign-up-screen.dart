@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/firebase/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -20,6 +22,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _verifyPasswordController = TextEditingController();
+   ApiService _apiService = ApiService(); // ApiService Instance
+   AuthService _authService = AuthService(); // AuthService Instance
 
   // Function to handle Sign-Up
   Future<void> _signUp() async {
@@ -30,6 +34,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+
+         _apiService.fetchUserData(_authService.getCurrentUser()!.uid, _firstNameController.text, _lastNameController.text).then((value) {
+         print('debugging');
+         print(value);
+
+       });
 
         // If successful, show success message
         ScaffoldMessenger.of(context).showSnackBar(

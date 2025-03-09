@@ -30,11 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
         print("user iddddd" + _authService.getCurrentUser()!.uid);
 
-        _apiService.fetchUserData(_authService.getCurrentUser()!.uid).then((value) {
+
+     /*   _apiService.fetchUserData(_authService.getCurrentUser()!.uid).then((value) {
          print('debugging');
          print(value);
 
        });
+       */
+      
 
         // Navigate to the main screen on success
         Navigator.pushReplacementNamed(context, '/main-screen');
