@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/firebase/auth_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -26,7 +29,13 @@ class ProfileScreen extends StatelessWidget {
                 logout();
                 print("User logged out");
               } else if (value == "Create Room") {
+                Navigator.pushNamed(context, '/create-room');
+               // showCreateRoomModal(context);
                 print("Navigate to Create Room");
+              } else if (value == "Join Room") {
+               // _showJoinRoomModal(context);
+                 Navigator.pushNamed(context, '/join-room');
+                print("Navigate to Join Room");
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -37,6 +46,16 @@ class ProfileScreen extends StatelessWidget {
                     Icon(Icons.add, color: Colors.black54),
                     SizedBox(width: 10),
                     Text("Create Room"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "Join Room",
+                child: Row(
+                  children: [
+                    Icon(Icons.add, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text("Join Room"),
                   ],
                 ),
               ),
@@ -107,4 +126,72 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+
+
+
+
+     void _showJoinRoomModal(BuildContext context) {
+      final TextEditingController _roomIdController = TextEditingController();
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Join Room",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+
+                // Room ID Field
+                TextField(
+                  controller: _roomIdController,
+                  decoration: InputDecoration(
+                    labelText: "Enter Room ID",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 15),
+
+                // Join Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_roomIdController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please enter a valid Room ID")),
+                        );
+                      } else {
+                        print("Joining Room: ${_roomIdController.text}");
+                        Navigator.pop(context); // Close modal after entering
+                      }
+                    },
+                    child: Text("Join Room"),
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          );
+        },
+      );
+    }
+  
 }

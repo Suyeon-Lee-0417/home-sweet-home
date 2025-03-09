@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/screens/create-room-screen.dart';
+import 'package:pineapple/screens/join-room-screen.dart';
 import 'package:pineapple/screens/login-screen.dart';
 import 'package:pineapple/screens/nav-screen.dart';
 import 'package:pineapple/screens/sign-up-screen.dart';
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
         '/main-screen': (context) => Navigation(),
         '/signup': (context) => SignUpScreen(),
         '/login': (context) => LoginScreen(),
+       '/create-room': (context) => CreateRoomScreen(),
+       '/join-room': (context) => JoinRoomScreen(),
       },
     );
   }
