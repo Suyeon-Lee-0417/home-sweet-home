@@ -160,4 +160,26 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
+// mark task as completed and award points
+router.put("/complete/:taskId", async (req: Request, res: Response) => {
+  try {
+    const task = await Task.findById(req.params.taskId);
+    if (!task) return res.status(404).json({message: "Task not found"});
+    // Get user that being assigned the task
+    const user = await User.findById(task.assignedTo);
+    if (!user) return res.status(404).json({message: "User not found"});
+
+    // update task as completed
+    task.isCompleted = true;
+
+    // award points to user
+    user.points += task.points;
+    await user.save();
+    await task.save();
+  } catch (error) {
+    console.error("Error updating task:", error);
+    res.status(500).json({message: "Error updating task", error});
+  }
+});
+
 export default router;
