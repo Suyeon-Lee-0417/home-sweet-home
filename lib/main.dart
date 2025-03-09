@@ -6,6 +6,7 @@ import 'package:pineapple/screens/create-room-screen.dart';
 import 'package:pineapple/screens/join-room-screen.dart';
 import 'package:pineapple/screens/login-screen.dart';
 import 'package:pineapple/screens/nav-screen.dart';
+import 'package:pineapple/screens/room-joined-result.dart';
 import 'package:pineapple/screens/sign-up-screen.dart';
 
 
@@ -31,6 +32,17 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
        '/create-room': (context) => CreateRoomScreen(),
        '/join-room': (context) => JoinRoomScreen(),
+       
+      },
+        onGenerateRoute: (settings) {
+        if (settings.name == '/room-joined') {
+          final args = settings.arguments as String;
+
+          return MaterialPageRoute(
+            builder: (context) => RoomJoinedScreen(roomName: args),
+          );
+        }
+        return null; // Returns null if no route matches, defaulting to `routes`
       },
     );
   }

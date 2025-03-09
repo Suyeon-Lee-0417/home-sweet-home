@@ -1,4 +1,9 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
+import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/firebase/auth_service.dart';
+import 'package:pineapple/main.dart';
 
 class JoinRoomScreen extends StatefulWidget {
   const JoinRoomScreen({super.key});
@@ -10,16 +15,20 @@ class JoinRoomScreen extends StatefulWidget {
 class _JoinRoomScreenState extends State<JoinRoomScreen> {
   final TextEditingController _roomCodeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  ApiService apiService = ApiService();
+  AuthService authService = AuthService();
 
   void _joinRoom() {
     if (_formKey.currentState!.validate()) {
-      String roomCode = _roomCodeController.text.trim();
-      print("Joining Room: $roomCode");
+      Future<String?> roomName = apiService.joinRoom(authService.getCurrentUser()!.uid, _roomCodeController.text);
+
+      print("Joining Room: $roomName");
 
       // TODO: Implement API call to join the room
+      Navigator.pushNamed(context, '/room-joined', arguments: roomName);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Joining Room: $roomCode")),
+        SnackBar(content: Text("Joining Room: $roomName")),
       );
     }
   }
@@ -58,7 +67,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return "Please enter a room code";
-                  }
+                  } 
                   return null;
                 },
               ),

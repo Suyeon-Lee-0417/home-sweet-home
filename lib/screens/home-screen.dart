@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/firebase/auth_service.dart';
+import 'package:pineapple/model/UserModel.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -9,6 +12,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ApiService apiService = ApiService();
+  late Future<UserModel?> _userFuture;
+  AuthService authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _userFuture = apiService.fetchUserData2(authService.getCurrentUser()!.uid); // Fetch user data
+  }
+
   final List<Color> tileColors = [
     Color(0xffF2FDBA), // Soft Yellow
     Color(0xffDEF0EA), // Light Teal
@@ -22,38 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
     Color(0xffD4A5A5), // Muted Rose
   ];
 
-
-  // ✅ Task List with Completion Status
   final List<Map<String, dynamic>> _tasks = [
     {
       "title": "Finish Flutter API Integration",
       "time": "9:00 AM - 10:30 AM",
-      "description": "Complete the integration with our RESTful API using Flutter's http package.",
-      "isCompleted": false, // Track completion status
+      "description": "Complete API integration using Flutter.",
+      "isCompleted": false,
     },
     {
       "title": "Design UI for Mobile App",
       "time": "11:00 AM - 12:00 PM",
-      "description": "Create wireframes and mockups in Figma for the new mobile app.",
+      "description": "Create wireframes and mockups.",
       "isCompleted": false,
     },
     {
       "title": "Team Stand-up Meeting",
       "time": "12:30 PM - 1:00 PM",
-      "description": "Discuss daily progress, blockers, and next steps with the team.",
+      "description": "Daily progress discussion with the team.",
       "isCompleted": false,
     },
   ];
-
-
- 
-
-  // Controllers for adding tasks
-  DateTime? _dueDate;
-  String _selectedPriority = 'Medium';
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _assignedToController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,31 +69,22 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Info Card
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage('assets/imgs/pic.jpeg'),
-                    ),
-                    SizedBox(width: 16),
-                    Text('Hey, User!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Spacer(),
-                    Text('Points Earned: 53 XP',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54)),
-                  ],
-                ),
-              ),
+            // ✅ Fetch User Data & Display User Info
+            FutureBuilder<UserModel?>(
+              future: _userFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildUserCard("Loading...", "Loading...");
+                } else if (snapshot.hasError || !snapshot.hasData) {
+                  return _buildUserCard("Guest", "0 XP");
+                } else {
+                  final user = snapshot.data!;
+                  return _buildUserCard("${user.firstName} ${user.lastName}", "${user.points} XP");
+                }
+              },
             ),
-
             SizedBox(height: 20),
+
             Text(
               "Your tasks for Today :)",
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
@@ -105,7 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: _tasks.length,
                       itemBuilder: (context, index) {
                         final Color randomColor = tileColors[index % tileColors.length];
-
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                           child: Material(
@@ -119,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  // ✅ Checkbox - Updates taskCompletion in Data
                                   Checkbox(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(5),
@@ -132,8 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                   ),
                                   SizedBox(width: 8),
-
-                                  // ✅ Task Title & Time
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            decoration: _tasks[index]["isCompleted"] ? TextDecoration.lineThrough : null,
+                                            decoration: _tasks[index]["isCompleted"]
+                                                ? TextDecoration.lineThrough
+                                                : null,
                                           ),
                                         ),
                                         Text(
@@ -151,7 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.grey,
-                                            decoration: _tasks[index]["isCompleted"] ? TextDecoration.lineThrough : null,
+                                            decoration: _tasks[index]["isCompleted"]
+                                                ? TextDecoration.lineThrough
+                                                : null,
                                           ),
                                         ),
                                       ],
@@ -164,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-            ),   
+            ),
           ],
         ),
       ),
@@ -177,158 +169,186 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ✅ Function to add a new task to the list
-  void _addTask(String title, String time) {
-    setState(() {
-      _tasks.add({
-        "title": title,
-        "time": time,
-      });
-    });
-  }
-
-  // ✅ Function to show the Bottom Sheet for Adding Tasks
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
+  // ✅ Build User Info Card
+  Widget _buildUserCard(String userName, String points) {
+    return Card(
+      elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.circular(10),
       ),
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                height: 600,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "New Task",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-
-                    // Task Title Field
-                    TextField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        labelText: "Task Title",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-
-                    // Description Field
-                    TextField(
-                      controller: _descriptionController,
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-
-                    // Due Date Picker
-                    Row(
-                      children: [
-                        Text(
-                          _dueDate == null ? "Select Due Date" : "Due Date: ${_dueDate!.toLocal()}".split(' ')[0],
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Spacer(),
-                        IconButton(
-                          icon: Icon(Icons.calendar_today, color: Colors.blue),
-                          onPressed: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2100),
-                            );
-                            if (pickedDate != null) {
-                              setModalState(() {
-                                _dueDate = pickedDate;
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-
-                    // Priority Dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedPriority,
-                      items: ['Low', 'Medium', 'High']
-                          .map((priority) => DropdownMenuItem(
-                                value: priority,
-                                child: Text(priority),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setModalState(() {
-                          _selectedPriority = value!;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: "Priority",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-
-                    // Assigned To Field
-                    TextField(
-                      controller: _assignedToController,
-                      decoration: InputDecoration(
-                        labelText: "Assign To",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: 15),
-
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_titleController.text.isNotEmpty) {
-                            _addTask(
-                              _titleController.text,
-                              _dueDate != null
-                                  ? "Due: ${_dueDate!.toLocal()}".split(' ')[0]
-                                  : "No Due Date",
-                            );
-
-                            _titleController.clear();
-                            _descriptionController.clear();
-                            _assignedToController.clear();
-                            _dueDate = null; // Reset due date
-                            Navigator.pop(context);
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Task Added Successfully!")),
-                            );
-                          }
-                        },
-                        child: Text("Add Task"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage('assets/imgs/pic.jpeg'),
+            ),
+            SizedBox(width: 16),
+            Text(
+              'Hey, $userName!',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            Spacer(),
+            Text(
+              'Points Earned: $points',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
+void _showBottomSheet(BuildContext context) {
+  String _selectedCategory = "Chore"; // Default Category
+  DateTime? _dueDate;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _pointsController = TextEditingController();
+  final TextEditingController _assignedToController = TextEditingController();
+
+  showModalBottomSheet(
+    backgroundColor: Colors.white,
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    isScrollControlled: true,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setModalState) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              padding: EdgeInsets.all(16),
+              height: 550,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "New Task",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Task Title Field
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: "Task Title",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Description Field
+                  TextField(
+                    controller: _descriptionController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: "Task Description",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Due Date Picker
+                  Row(
+                    children: [
+                      Text(
+                        _dueDate == null
+                            ? "Select Due Date"
+                            : "Due Date: ${_dueDate!.toLocal()}".split(' ')[0],
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.calendar_today, color: Colors.blue),
+                        onPressed: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            setModalState(() {
+                              _dueDate = pickedDate;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Category Dropdown
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    items: ["Chore", "Grocery"]
+                        .map((category) => DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setModalState(() {
+                        _selectedCategory = value!;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Category",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Assigned To Field
+                  TextField(
+                    controller: _assignedToController,
+                    decoration: InputDecoration(
+                      labelText: "Assign To (User ID or Name)",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // ✅ Points Field
+                  TextField(
+                    controller: _pointsController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: "Points",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+
+                  // ✅ Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_titleController.text.isNotEmpty) {
+                          // Handle task creation here
+
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Task Added Successfully!")),
+                          );
+                        }
+                      },
+                      child: Text("Add Task"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 }
