@@ -20,6 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
    String? userFullName;
   Future<List<Map<String, dynamic>>?>? _tasksFuture;
 
+  int userPoints = 0;
+
+
   @override
   void initState() {
     super.initState();
@@ -66,11 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return buildUserCard("Loading...", "Loading...");
-                } else if (snapshot.hasError || !snapshot.hasData) {
-                  return buildUserCard("Guest", "0 XP");
                 } else {
                   final user = snapshot.data!;
-                  return buildUserCard("${user.firstName} ${user.lastName}", "${user.points} XP");
+                  return buildUserCard("${user.firstName} ${user.lastName}", "${userPoints} XP");
                 }
               },
             ),
@@ -113,6 +114,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         onChanged: (bool? value) {
                           setState(() {
                             task["isCompleted"] = value!;
+                            if(value == true){
+                              userPoints = userPoints + 10;
+                            } else {
+                              userPoints = userPoints - 10;
+                            }
+                            
                           });
                         },
                       ),
