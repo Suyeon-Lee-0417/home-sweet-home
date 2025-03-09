@@ -4,6 +4,7 @@ import Task from "../model/Task";
 import Team from "../model/Team";
 import User from "../model/User";
 import {Schema} from "mongoose";
+import moment from "moment-timezone";
 
 const router = Router();
 
@@ -67,6 +68,7 @@ router.post("/", async (req: Request, res: Response) => {
  * Get all tasks for current user due today.
  * GET /api/tasks/:uid
  */
+
 router.get("/:uid", async (req: Request, res: Response) => {
   try {
     const {uid} = req.params;
@@ -75,19 +77,20 @@ router.get("/:uid", async (req: Request, res: Response) => {
     const user = await User.findOne({firebaseUid: uid});
     if (!user) return res.status(404).json({message: "User not found"});
 
-    // Calculate the start and end of the current day
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // Calculate the current time and 24 hours from now
+    const now = new Date();
+    const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    console.log("Current time:", now);
+    console.log("24 hours from now:", twentyFourHoursFromNow);
 
-    console.log("Start of day:", startOfDay);
-    console.log("End of day:", endOfDay);
-
-    // Query tasks due today
+    // Query tasks due within the next 24 hours
     const tasks = await Task.find({
-      assignedTo: user._id
+      assignedTo: user._id,
+      dueDate: {
+        $gte: now,
+        $lte: twentyFourHoursFromNow
+      }
     });
 
     res.json({tasks});
@@ -96,7 +99,6 @@ router.get("/:uid", async (req: Request, res: Response) => {
     res.status(500).json({message: "Error fetching tasks", error});
   }
 });
-
 /**
  * Get a single task by ID.
  * GET /api/tasks/:id

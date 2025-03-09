@@ -21,6 +21,7 @@
     "express": "^4.21.2",
     "firebase-admin": "^13.2.0",
     "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.47",
     "mongoose": "^8.10.0"
   },
   "devDependencies": {
