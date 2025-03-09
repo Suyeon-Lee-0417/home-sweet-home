@@ -239,4 +239,47 @@ Future<List<Map<String, dynamic>>?> fetchUsersInRoom(String teamId) async {
   }
 }
 
+
+
+
+  Future<List<Map<String, dynamic>>?> fetchTasks(String userId) async {
+  final String endpoint = "$baseUrl/tasks/$userId"; // Adjust the endpoint if needed
+
+  try {
+    print("🚀 Sending GET request to: $endpoint");
+
+    final response = await http.get(
+      Uri.parse(endpoint),
+      headers: {"Content-Type": "application/json"},
+    ).timeout(Duration(seconds: 10));
+
+    print("📩 Response Status Code: ${response.statusCode}");
+    print("📩 Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      try {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+
+        // Ensure the response contains a "tasks" key and it's a list
+        if (body.containsKey("tasks") && body["tasks"] is List) {
+          print("✅ Parsed Task List Successfully: ${body["tasks"].length} tasks found.");
+          return List<Map<String, dynamic>>.from(body["tasks"]);
+        } else {
+          print("❌ Unexpected response format: Missing 'tasks' key or incorrect type.");
+          return [];
+        }
+      } catch (e) {
+        print("❌ JSON Parsing Error: $e");
+        return [];
+      }
+    } else {
+      print("❌ Failed Request: ${response.reasonPhrase}");
+      return [];
+    }
+  } catch (e) {
+    print("🔥 Network Exception: $e");
+    return [];
+  }
+  }
+
 }

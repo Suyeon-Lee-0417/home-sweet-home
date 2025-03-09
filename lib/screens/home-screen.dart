@@ -17,11 +17,15 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<UserModel?> _userFuture;
   Future<List<Map<String, dynamic>>?>? _teamMembersFuture;
   String? teamId;
+   String? userFullName;
+  Future<List<Map<String, dynamic>>?>? _tasksFuture;
 
   @override
   void initState() {
     super.initState();
     _fetchUserAndTeam();
+    apiService.fetchTasks(authService.getCurrentUser()!.uid);
+    
   }
 
   // ✅ Fetch User and Team Data
@@ -32,7 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
       if (user != null && user.teamId.isNotEmpty) {
         setState(() {
           teamId = user.teamId;
+          userFullName = user.firstName + " " + user.lastName;
           _teamMembersFuture = apiService.fetchUsersInRoom(teamId!);
+          _tasksFuture = apiService.fetchTasks(authService.getCurrentUser()!.uid);
         });
       }
     });
@@ -70,7 +76,89 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 20),
             Text("Your tasks for Today :)", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-            Expanded(child: Center(child: Text("No tasks yet. Tap + to add a new task!"))),
+
+           Expanded(
+  child: FutureBuilder<List<Map<String, dynamic>>?>(
+    future: _tasksFuture,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator()); // Loading indicator
+      } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+        return Center(child: Text("No tasks available."));
+      } else {
+        return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final task = snapshot.data![index];
+            final Color randomColor = tileColors[index % tileColors.length];
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: randomColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        value: task["isCompleted"] ?? false,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            task["isCompleted"] = value!;
+                          });
+                        },
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task["title"],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                decoration: (task["isCompleted"] ?? false)
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                            Text(
+                              "Due: ${task["dueDate"].toString().split('T')[0]}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                decoration: (task["isCompleted"] ?? false)
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                            Text(
+                              "Assigned to:  $userFullName",
+                              style: TextStyle(fontSize: 12, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }
+    },
+  ),
+),
           ],
         ),
       ),
