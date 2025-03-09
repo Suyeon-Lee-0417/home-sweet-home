@@ -82,6 +82,9 @@ router.get("/:uid", async (req: Request, res: Response) => {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    console.log("Start of day:", startOfDay);
+    console.log("End of day:", endOfDay);
+
     // Query tasks due today
     const tasks = await Task.find({
       assignedTo: user._id
