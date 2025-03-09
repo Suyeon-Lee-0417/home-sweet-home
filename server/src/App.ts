@@ -3,8 +3,9 @@ import express from "express";
 import dotenv from "dotenv";
 import {connectDB} from "./utils/DBconnection";
 import authRouter from "./routes/auth";
-import teamRoute from "./routes/team";
-import taskRoute from "./routes/task";
+import teamRouter from "./routes/team";
+import taskRouter from "./routes/task";
+import userRouter from "./routes/user";
 
 dotenv.config();
 
@@ -21,7 +22,8 @@ app.get(`${endpoint}/`, (req, res) => {
 });
 
 app.use(`${endpoint}/auth`, authRouter);
-app.use(`${endpoint}/teams`, teamRoute);
-app.use(`${endpoint}/tasks`, taskRoute);
+app.use(`${endpoint}/teams`, teamRouter);
+app.use(`${endpoint}/tasks`, taskRouter);
+app.use(`${endpoint}/users`, userRouter);
 
 export default app;
