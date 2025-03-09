@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pineapple/screens/game-screen.dart';
 import 'package:pineapple/screens/groceries-screen.dart';
 import 'package:pineapple/screens/home-screen.dart';
 import 'package:pineapple/screens/profile-screen.dart';
@@ -16,6 +17,7 @@ class _NavigationState extends State<Navigation> {
   // List of screens for navigation
   static final List<Widget> _screens = [
     GroceriesScreen(),
+    GameScreen(),
     HomeScreen(),
     ProfileScreen()
   ];
@@ -45,11 +47,15 @@ class _NavigationState extends State<Navigation> {
             label: 'Groceries',
           ),
           BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.home, 1),
+            icon: _buildNavIcon(Icons.gamepad, 1),
+            label: 'Game',
+          ),
+          BottomNavigationBarItem(
+            icon: _buildNavIcon(Icons.home, 2),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.person, 2),
+            icon: _buildNavIcon(Icons.person, 3),
             label: 'Profile',
           ),
         ],

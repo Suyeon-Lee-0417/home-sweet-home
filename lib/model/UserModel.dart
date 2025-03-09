@@ -1,45 +1,55 @@
 class UserModel {
   final String id;
+  final String firebaseUid;
+  final String email;
+  final String displayName;
   final String firstName;
   final String lastName;
-  final String email;
-  final String profilePicUrl;
-  int xpPoints; // Gamification feature
-  List<String> tasksAssigned; // List of task IDs
+  final int points;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   UserModel({
     required this.id,
+    required this.firebaseUid,
+    required this.email,
+    required this.displayName,
     required this.firstName,
     required this.lastName,
-    required this.email,
-    required this.profilePicUrl,
-    this.xpPoints = 0,
-    this.tasksAssigned = const [],
+    required this.points,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  // Convert UserModel to a Map (for Firebase/SQLite)
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'email': email,
-      'profilePicUrl': profilePicUrl,
-      'xpPoints': xpPoints,
-      'tasksAssigned': tasksAssigned,
-    };
+  // ✅ Factory constructor to create a UserModel from JSON
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final user = json["user"] ?? {}; // Make sure "user" exists before parsing
+
+    return UserModel(
+      id: user["_id"] ?? "",  // Use empty string as fallback
+      firebaseUid: user["firebaseUid"] ?? "",
+      email: user["email"] ?? "",
+      displayName: user["displayName"] ?? "",
+      firstName: user["firstName"] ?? "Guest", // Default name if null
+      lastName: user["lastName"] ?? "",
+      points: user["points"] ?? 0, // Default to 0
+      createdAt: DateTime.tryParse(user["createdAt"] ?? "") ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(user["updatedAt"] ?? "") ?? DateTime.now(),
+    );
   }
 
-  // Convert a Map back into a UserModel object
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
-      email: map['email'],
-      profilePicUrl: map['profilePicUrl'],
-      xpPoints: map['xpPoints'] ?? 0,
-      tasksAssigned: List<String>.from(map['tasksAssigned'] ?? []),
-    );
+  // ✅ Convert UserModel to JSON for storing locally
+  Map<String, dynamic> toJson() {
+    return {
+      "_id": id,
+      "firebaseUid": firebaseUid,
+      "email": email,
+      "displayName": displayName,
+      "firstName": firstName,
+      "lastName": lastName,
+      "points": points,
+      "createdAt": createdAt.toIso8601String(),
+      "updatedAt": updatedAt.toIso8601String(),
+    };
   }
 }
