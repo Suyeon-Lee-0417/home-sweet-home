@@ -134,13 +134,109 @@ Future<UserModel?> fetchUserData2(String userId) async {
   }
 }
 
-Future<String?> fetchUsersInRoom(String ) async {
-    //final String endpoint = "$baseUrl/teams/$"; 
+Future<List<Map<String, dynamic>>?> fetchUsersInRoom(String teamId) async {
+  final String endpoint = "$baseUrl/teams/$teamId/users"; // Adjust if needed
+
+  try {
+    print("🚀 Sending GET request to: $endpoint");
+
+    final response = await http.get(
+      Uri.parse(endpoint),
+      headers: {"Content-Type": "application/json"},
+    ).timeout(Duration(seconds: 10));
+
+    print("📩 Response Status Code: ${response.statusCode}");
+    print("📜 Raw Response Body:\n${response.body}");
+
+    if (response.statusCode == 200) {
+      try {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        print("🔍 Decoded JSON: $body");
+
+        if (body.containsKey("users") && body["users"] is List) {
+          List<dynamic> usersList = body["users"];
+          print("✅ Parsed User List Successfully: ${usersList.length} users found.");
+
+          for (var user in usersList) {
+            print("👤 User: ${user["_id"]}, Name: ${user["firstName"]} ${user["lastName"]}, Email: ${user["email"]}");
+          }
+
+          return usersList.map((user) => user as Map<String, dynamic>).toList();
+        } else {
+          print("❌ Unexpected response format: Expected a 'users' key with a List, got ${body.runtimeType}");
+          return null;
+        }
+      } catch (e) {
+        print("❌ JSON Parsing Error: $e");
+        return null;
+      }
+    } else {
+      print("❌ Failed Request: ${response.reasonPhrase}");
+      print("🔎 Response Body: ${response.body}");
+      return null;
+    }
+  } catch (e) {
+    print("🔥 Network Exception: $e");
+    return null;
+  }
 }
 
 
+ Future<bool> addTask({
+  required String teamId,
+  required String title,
+  required String description,
+  required DateTime dueDate,
+  required String category,
+  required String assignedTo,
+  required String createdByUid,
+  required int points,
+  String priority = "low",
+  Map<String, dynamic>? recurrence,
+}) async {
+  final String endpoint = "$baseUrl/tasks"; // Ensure this is correct!
 
+  try {
+    print("🚀 Sending POST request to: $endpoint");
 
+    final Map<String, dynamic> taskData = {
+      "teamId": teamId,
+      "title": title,
+      "description": description,
+      "dueDate": dueDate.toIso8601String(),
+      "category": category,
+      "assignedTo": assignedTo,
+      "createdByUid": createdByUid,
+      "points": points,
+      "priority": priority,
+      if (recurrence != null) "recurrence": recurrence,
+    };
 
+    print("📤 Request Body: ${jsonEncode(taskData)}");
+
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(taskData),
+    );
+
+    print("📩 Response Status Code: ${response.statusCode}");
+    print("📩 Response Body: ${response.body}");
+
+    if (response.statusCode == 201) {
+      print("✅ Task added successfully!");
+      return true;
+    } else {
+      print("❌ Failed to add task. Status Code: ${response.statusCode}");
+      print("🔎 Error Details: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    print("🔥 Network Exception: $e");
+    return false;
+  }
+}
 
 }

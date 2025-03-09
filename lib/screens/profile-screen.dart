@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:pineapple/api/api_service.dart';
-import 'package:pineapple/firebase/auth_service.dart';
+import 'package:pineapple/model/UserModel.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser; // Get logged-in user
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
 
-    void logout() async {
-      await FirebaseAuth.instance.signOut();
-      Navigator.pushReplacementNamed(context, '/login'); // Redirect to login
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ApiService apiService = ApiService();
+  final User? firebaseUser = FirebaseAuth.instance.currentUser;
+  late Future<UserModel?> _userFuture;
+  Future<List<Map<String, dynamic>>?>? _usersFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    if (firebaseUser != null) {
+      _userFuture = apiService.fetchUserData2(firebaseUser!.uid);
     }
+  }
 
+  void logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/login'); // Redirect to login
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -27,171 +42,119 @@ class ProfileScreen extends StatelessWidget {
             onSelected: (value) {
               if (value == "logout") {
                 logout();
-                print("User logged out");
               } else if (value == "Create Room") {
                 Navigator.pushNamed(context, '/create-room');
-               // showCreateRoomModal(context);
-                print("Navigate to Create Room");
               } else if (value == "Join Room") {
-               // _showJoinRoomModal(context);
-                 Navigator.pushNamed(context, '/join-room');
-                print("Navigate to Join Room");
+                Navigator.pushNamed(context, '/join-room');
               }
             },
             itemBuilder: (BuildContext context) => [
-              PopupMenuItem(
-                value: "Create Room",
-                child: Row(
-                  children: [
-                    Icon(Icons.add, color: Colors.black54),
-                    SizedBox(width: 10),
-                    Text("Create Room"),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: "Join Room",
-                child: Row(
-                  children: [
-                    Icon(Icons.add, color: Colors.black54),
-                    SizedBox(width: 10),
-                    Text("Join Room"),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: "logout",
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text("Logout"),
-                  ],
-                ),
-              ),
+              PopupMenuItem(value: "Create Room", child: Text("Create Room")),
+              PopupMenuItem(value: "Join Room", child: Text("Join Room")),
+              PopupMenuItem(value: "logout", child: Text("Logout")),
             ],
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Profile Picture
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey.shade300,
-                child: Icon(Icons.person, size: 50, color: Colors.white),
-              ),
-            ),
-            SizedBox(height: 20),
+        child: FutureBuilder<UserModel?>(
+          future: _userFuture,
+          builder: (context, userSnapshot) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (userSnapshot.hasError || userSnapshot.data == null) {
+              return Center(child: Text("❌ Error loading profile"));
+            }
 
-            // Display User Email
-            Text(
-              user?.email ?? "No Email Found",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
+            final user = userSnapshot.data!;
+            _usersFuture ??= apiService.fetchUsersInRoom(user.teamId);
 
-            // Display User UID
-            Text(
-              "User ID: ${user?.uid ?? 'No UID'}",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-
-            // Spacer to push Logout Button to the Bottom
-            Expanded(child: SizedBox()),
-
-            // Logout Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: logout,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 🔹 Profile Picture
+                Center(
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey.shade300,
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                 ),
-                child: Text(
-                  "Logout",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+                SizedBox(height: 20),
 
-
-
-
-
-     void _showJoinRoomModal(BuildContext context) {
-      final TextEditingController _roomIdController = TextEditingController();
-
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                // 🔹 Display User Name & Email
                 Text(
-                  "Join Room",
+                  "${user.firstName} ${user.lastName}",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  user.email,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+
+                SizedBox(height: 20),
+                Divider(),
+                SizedBox(height: 10),
+
+                // 🔹 Team Name
+                Text(
+                  "Team: ${user.teamName}",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
 
-                // Room ID Field
-                TextField(
-                  controller: _roomIdController,
-                  decoration: InputDecoration(
-                    labelText: "Enter Room ID",
-                    border: OutlineInputBorder(),
+                // 🔹 Users in Room Section
+                Expanded(
+                  child: FutureBuilder<List<Map<String, dynamic>>?>(
+                    future: _usersFuture,
+                    builder: (context, usersSnapshot) {
+                      if (usersSnapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (usersSnapshot.hasError || usersSnapshot.data == null) {
+                        return Center(child: Text("❌ Error loading users"));
+                      } else if (usersSnapshot.data!.isEmpty) {
+                        return Center(child: Text("No users in this team"));
+                      }
+
+                      return ListView.builder(
+                        itemCount: usersSnapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final teamUser = usersSnapshot.data![index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.grey.shade300,
+                              child: Icon(Icons.person, color: Colors.white),
+                            ),
+                            title: Text(teamUser["firstName"] ?? "Unknown User"),
+                            subtitle: Text(teamUser["email"] ?? "No Email"),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
-                SizedBox(height: 15),
 
-                // Join Button
+                // 🔹 Logout Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_roomIdController.text.trim().isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Please enter a valid Room ID")),
-                        );
-                      } else {
-                        print("Joining Room: ${_roomIdController.text}");
-                        Navigator.pop(context); // Close modal after entering
-                      }
-                    },
-                    child: Text("Join Room"),
+                    onPressed: logout,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text("Logout", style: TextStyle(fontSize: 18)),
                   ),
                 ),
-                SizedBox(height: 10),
               ],
-            ),
-          );
-        },
-      );
-    }
-  
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
