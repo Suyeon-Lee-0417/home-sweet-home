@@ -12,7 +12,7 @@ class Navigation extends StatefulWidget {
 }
 
 class _NavigationState extends State<Navigation> {
-  int _selectedIndex = 1; // Tracks selected tab index
+  int _selectedIndex = 2; // Tracks selected tab index
 
   // List of screens for navigation
   static final List<Widget> _screens = [
