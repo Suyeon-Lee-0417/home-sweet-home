@@ -161,6 +161,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 });
 
 // mark task as completed and award points
+// PUT /api/tasks/complete/:taskId
 router.put("/complete/:taskId", async (req: Request, res: Response) => {
   try {
     const task = await Task.findById(req.params.taskId);

@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import {sendNotificationToDevice} from "./notifications";
 import Task from "../model/Task";
+import User from "../model/User";
 
 async function checkTaskDeadlines() {
   // Find tasks with deadlines 1 day from now
@@ -21,7 +22,17 @@ async function checkTaskDeadlines() {
       data: {taskId: task._id as string}
     };
 
-    // await sendNotificationToDevice(, payload); // store client token
+    const reciever = await User.findById(task.assignedTo);
+    if (!reciever) {
+      console.error("User not found for task:", task._id);
+      continue;
+    }
+
+    if (reciever.fcmToken) {
+      await sendNotificationToDevice(reciever.fcmToken, payload);
+    } else {
+      console.error("FCM token not found for user:", reciever._id);
+    }
   }
 }
 

@@ -7,6 +7,7 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   points: number;
+  fcmToken?: string;
   // add more fields as needed
 }
 
@@ -17,7 +18,8 @@ const UserSchema: Schema = new Schema(
     displayName: {type: String},
     firstName: {type: String, required: true},
     lastName: {type: String, required: true},
-    points: {type: Number, default: 0, required: true}
+    points: {type: Number, default: 0, required: true},
+    fcmToken: {type: String}
   },
   {timestamps: true}
 );
