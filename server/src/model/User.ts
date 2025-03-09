@@ -6,6 +6,7 @@ export interface IUser extends Document {
   displayName?: string;
   firstName: string;
   lastName: string;
+  points: number;
   // add more fields as needed
 }
 
@@ -15,7 +16,8 @@ const UserSchema: Schema = new Schema(
     email: {type: String, required: true},
     displayName: {type: String},
     firstName: {type: String, required: true},
-    lastName: {type: String, required: true}
+    lastName: {type: String, required: true},
+    points: {type: Number, default: 0, required: true}
   },
   {timestamps: true}
 );

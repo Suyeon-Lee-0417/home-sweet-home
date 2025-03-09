@@ -12,7 +12,7 @@ export interface ITask extends Document {
   description: string;
   isCompleted: boolean;
   assignedTo?: Schema.Types.ObjectId;
-  createdBy: Schema.Types.ObjectId;
+  createdByUid: string;
   teamId: Schema.Types.ObjectId;
   category: string;
   dueDate: Date;
@@ -41,7 +41,7 @@ const TaskSchema: Schema = new Schema(
     description: {type: String},
     isCompleted: {type: Boolean, default: false},
     assignedTo: {type: Schema.Types.ObjectId, ref: "User"},
-    createdBy: {type: Schema.Types.ObjectId, ref: "User", required: true},
+    createdByUid: {type: String},
     category: {type: String, required: true},
     teamId: {type: Schema.Types.ObjectId, ref: "Team", required: true},
     dueDate: {type: Date, required: true},
