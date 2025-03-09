@@ -5,14 +5,14 @@ import 'package:pineapple/screens/home-screen.dart';
 import 'package:pineapple/screens/profile-screen.dart';
 
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class Navigation extends StatefulWidget {
+  const Navigation({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<Navigation> createState() => _NavigationState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _NavigationState extends State<Navigation> {
   int _selectedIndex = 1; // Tracks selected tab index
 
   // List of screens for navigation

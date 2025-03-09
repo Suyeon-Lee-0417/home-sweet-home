@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -11,18 +12,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>(); // Form key for validation
   bool _obscurePassword = true; // Toggle Password Visibility
   bool _obscureVerifyPassword = true; // Toggle Verify Password Visibility
+
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase instance
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _verifyPasswordController = TextEditingController();
 
-  void _signUp() {
+  // Function to handle Sign-Up
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // Perform Sign-Up Logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Sign-Up Successful!")),
-      );
+      try {
+        // Sign up user with Firebase Authentication
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // If successful, show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Sign-Up Successful!")),
+        );
+
+        // Clear fields
+        _firstNameController.clear();
+        _lastNameController.clear();
+        _emailController.clear();
+        _passwordController.clear();
+        _verifyPasswordController.clear();
+
+        // Redirect to login screen
+        Navigator.pushReplacementNamed(context, '/login');
+      } catch (e) {
+        // Handle Firebase authentication errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}")),
+        );
+      }
     }
   }
 
@@ -57,7 +85,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // First Name & Last Name Row
                   Row(
                     children: [
-                      // First Name Field
                       Expanded(
                         child: TextFormField(
                           controller: _firstNameController,
@@ -69,16 +96,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Enter first name";
-                            }
+                            if (value == null || value.isEmpty) return "Enter first name";
                             return null;
                           },
                         ),
                       ),
-                      SizedBox(width: 10), // Space between fields
-                      
-                      // Last Name Field
+                      SizedBox(width: 10), 
                       Expanded(
                         child: TextFormField(
                           controller: _lastNameController,
@@ -90,9 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Enter last name";
-                            }
+                            if (value == null || value.isEmpty) return "Enter last name";
                             return null;
                           },
                         ),
@@ -113,11 +134,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Enter your email";
-                      }
-                      if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                          .hasMatch(value)) {
+                      if (value == null || value.isEmpty) return "Enter your email";
+                      if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
                         return "Enter a valid email";
                       }
                       return null;
@@ -133,9 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       labelText: "Password",
                       prefixIcon: Icon(Icons.lock),
                       suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                        ),
+                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -147,12 +163,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Enter a password";
-                      }
-                      if (value.length < 6) {
-                        return "Password must be at least 6 characters";
-                      }
+                      if (value == null || value.isEmpty) return "Enter a password";
+                      if (value.length < 6) return "Password must be at least 6 characters";
                       return null;
                     },
                   ),
@@ -166,9 +178,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       labelText: "Verify Password",
                       prefixIcon: Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureVerifyPassword ? Icons.visibility_off : Icons.visibility,
-                        ),
+                        icon: Icon(_obscureVerifyPassword ? Icons.visibility_off : Icons.visibility),
                         onPressed: () {
                           setState(() {
                             _obscureVerifyPassword = !_obscureVerifyPassword;
@@ -180,12 +190,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Re-enter password";
-                      }
-                      if (value != _passwordController.text) {
-                        return "Passwords do not match";
-                      }
+                      if (value == null || value.isEmpty) return "Re-enter password";
+                      if (value != _passwordController.text) return "Passwords do not match";
                       return null;
                     },
                   ),
@@ -202,10 +208,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(fontSize: 18),
-                      ),
+                      child: Text("Sign Up", style: TextStyle(fontSize: 18)),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -217,13 +220,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Text("Already have an account?"),
                       TextButton(
                         onPressed: () {
-                          // Navigate to login screen
                           Navigator.pushReplacementNamed(context, '/login');
                         },
-                        child: Text(
-                          "Log In",
-                          style: TextStyle(color: Colors.blueAccent),
-                        ),
+                        child: Text("Log In", style: TextStyle(color: Colors.blueAccent)),
                       ),
                     ],
                   ),

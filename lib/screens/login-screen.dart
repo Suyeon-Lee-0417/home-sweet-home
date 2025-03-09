@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pineapple/api/api_service.dart';
+import 'package:pineapple/firebase/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,20 +11,50 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  AuthService _authService = AuthService(); // AuthService Instance
   final _formKey = GlobalKey<FormState>(); // Form key for validation
   bool _obscurePassword = true; // Toggle Password Visibility
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth Instance
+  ApiService _apiService = ApiService(); // ApiService Instance
 
-  void _login() {
+  // Function to handle Login
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // Perform Login Logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login Successful!")),
-      );
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
 
-      Navigator.pushReplacementNamed(context, '/main-screen');
+        print("user iddddd" + _authService.getCurrentUser()!.uid);
+
+        _apiService.fetchUserData(_authService.getCurrentUser()!.uid).then((value) {
+         print('debugging');
+         print(value);
+
+       });
+
+        // Navigate to the main screen on success
+        Navigator.pushReplacementNamed(context, '/main-screen');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login Successful! 🎉")),
+        );
+      } catch (e) {
+        // Handle errors (e.g., invalid credentials)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}")),
+        );
+      }
     }
+
+
+
+
+
+    
   }
 
   @override
@@ -148,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextButton(
                         onPressed: () {
                           // Navigate to Sign Up screen
-                          Navigator.pushReplacementNamed(context,'/signup');
+                          Navigator.pushReplacementNamed(context, '/signup');
                         },
                         child: Text(
                           "Sign Up",

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "289616400325",
+    "project_id": "cmd-f-2025-3ebbb",
+    "storage_bucket": "cmd-f-2025-3ebbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289616400325:android:2d4c55dc00343fd54105ac",
+        "android_client_info": {
+          "package_name": "com.example.pineapple"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289616400325-9qgc2q5enj38fuv1ugp9l4oegj1a7rdc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHslXLrM13eOZN55pOrAcXYyX210de-jA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289616400325-9qgc2q5enj38fuv1ugp9l4oegj1a7rdc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
