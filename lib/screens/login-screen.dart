@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(height: 10),
@@ -145,17 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 10),
 
-                  // Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Navigate to Forgot Password Screen
-                      },
-                      child: Text("Forgot Password?"),
-                    ),
-                  ),
-                  SizedBox(height: 20),
+
 
                   // Login Button
                   SizedBox(
@@ -163,6 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 195, 189, 121),
+                      
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -170,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         "Login",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ),
                   ),

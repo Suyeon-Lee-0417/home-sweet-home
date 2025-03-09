@@ -208,7 +208,7 @@ class _GameScreenState extends State<GameScreen> {
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("🎁 You clicked on '${_prizes[index]["prize"]}'!"),
+                          content: Text("You clicked on '${_prizes[index]["prize"]}'!"),
                         ),
                       );
                     },
@@ -236,7 +236,7 @@ class _GameScreenState extends State<GameScreen> {
                           SizedBox(height: 5),
                           Text(
                             _prizes[index]["daysLeft"]!,
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            style: TextStyle(fontSize: 12, color: Colors.black54),
                           ),
                         ],
                       ),

@@ -77,71 +77,71 @@ Future<void> _generateRoomId() async {
         backgroundColor: Colors.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Room Name Field
-            Text(
-              "Room Name",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              controller: _roomNameController,
-              decoration: InputDecoration(
-                hintText: "Enter room name",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorText: _errorText, // Show error text if validation fails
-              ),
-              onChanged: (value) {
-                if (_errorText != null && value.trim().isNotEmpty) {
-                  setState(() {
-                    _errorText = null; // Remove error when user types
-                  });
-                }
-              },
-            ),
-            SizedBox(height: 20),
-
-            // Generate Room ID Button
-            Center(
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _generateRoomId,
-                child: _isLoading
-                    ? SizedBox(
-                        width: 20, height: 20, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : Text("Generate Room ID"),
-              ),
-            ),
-            SizedBox(height: 20),
-
-            // Display Room ID (if available)
-            if (_roomId.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "Room ID: $_roomId",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-                  ),
-                  SizedBox(height: 10),
-
-                  // Copy Room ID Button
-                  ElevatedButton.icon(
-                    onPressed: _copyRoomId,
-                    icon: Icon(Icons.copy),
-                    label: Text("Copy Room ID"),
-                  ),
-                ],
-              ),
-          ],
+  padding: const EdgeInsets.all(20.0),
+  child: Center( // Wrap in Center widget
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+      crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+      children: [
+        // Room Name Field
+        Text(
+          "Room Name",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-      ),
+        SizedBox(height: 8),
+        TextField(
+          controller: _roomNameController,
+          decoration: InputDecoration(
+            hintText: "Enter room name",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            errorText: _errorText, // Show error text if validation fails
+          ),
+          onChanged: (value) {
+            if (_errorText != null && value.trim().isNotEmpty) {
+              setState(() {
+                _errorText = null; // Remove error when user types
+              });
+            }
+          },
+        ),
+        SizedBox(height: 20),
+
+        // Generate Room ID Button
+        ElevatedButton(
+          onPressed: _isLoading ? null : _generateRoomId,
+          child: _isLoading
+              ? SizedBox(
+                  width: 20, height: 20, 
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : Text("Generate Room ID"),
+        ),
+        SizedBox(height: 20),
+
+        // Display Room ID (if available)
+        if (_roomId.isNotEmpty)
+          Column(
+            children: [
+              Text(
+                "Room ID: $_roomId",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+              ),
+              SizedBox(height: 10),
+
+              // Copy Room ID Button
+              ElevatedButton.icon(
+                onPressed: _copyRoomId,
+                icon: Icon(Icons.copy),
+                label: Text("Copy Room ID"),
+              ),
+            ],
+          ),
+      ],
+    ),
+  ),
+),
     );
   }
 }
