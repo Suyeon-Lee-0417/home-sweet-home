@@ -56,6 +56,9 @@ router.post("/", async (req: Request, res: Response) => {
       recurrence
     });
 
+    // add the new task to the team's task list
+    await Team.findByIdAndUpdate(teamId, {$push: {tasksIds: newTask._id}});
+
     const savedTask = await newTask.save();
     res.status(201).json({task: savedTask});
   } catch (error) {
