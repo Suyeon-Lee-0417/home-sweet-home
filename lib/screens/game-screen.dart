@@ -43,6 +43,7 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
+              color: Color(0xFF76B3D0),
               elevation: 4,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -82,7 +83,7 @@ class _GameScreenState extends State<GameScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: Color(0xFFFFC0CB), // 💖 Pink Background
+                color: Color(0xFFFFA679), // 💖 Pink Background
                 borderRadius: BorderRadius.circular(20),
               ),
               child: SingleChildScrollView(
@@ -159,7 +160,7 @@ class _GameScreenState extends State<GameScreen> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text(
               'Claim your Sweet Treat!',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.pink),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             ),
           ),
           Padding(
@@ -187,12 +188,12 @@ class _GameScreenState extends State<GameScreen> {
                   return Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Color(0xFFEBD7D7),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.pinkAccent, width: 2),
+                      // border: Border.all(color: Colors.pinkAccent, width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.pink.withOpacity(0.3),
+                          color: Color(0xFFEBD7D7),
                           blurRadius: 5,
                           spreadRadius: 2,
                         ),
