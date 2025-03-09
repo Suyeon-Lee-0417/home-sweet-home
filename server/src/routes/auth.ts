@@ -10,34 +10,32 @@ const router = Router();
 
 // POST /api/auth
 router.post("/", async (req: Request, res: Response) => {
-  const {idToken} = req.body;
+  const {uid} = req.body;
 
-  if (!idToken) {
+  if (!uid) {
     return res.status(400).json({message: "ID token is required."});
   }
 
   try {
-    // Verify Firebase ID token
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const {uid, email, name} = decodedToken;
+    // // Verify Firebase ID token
+    // const decodedToken = await admin.auth().verifyIdToken(idToken);
+    // const {uid, email, name} = decodedToken;
+
+    const firebaseUser = await admin.auth().getUser(uid);
+    const {uid: firebaseUid, email, displayName: name} = firebaseUser;
 
     // Check if user exists in MongoDB, else create one
-    let user: IUser | null = await User.findOne({firebaseUid: uid});
+    let user: IUser | null = await User.findOne({firebaseUid: firebaseUid});
     if (!user) {
       user = new User({
-        firebaseUid: uid,
+        firebaseUid: firebaseUid,
         email: email,
         displayName: name || ""
       });
       await user.save();
     }
 
-    // Create a custom JWT for your API
-    const jwtToken = jwt.sign({uid: user.firebaseUid, email: user.email}, process.env.JWT_SECRET as string, {
-      expiresIn: "24h"
-    });
-
-    res.json({token: jwtToken});
+    res.status(200).json({message: "Authentication successful", user});
   } catch (error) {
     console.error("Authentication error:", error);
     res.status(401).json({message: "Invalid token", error});
