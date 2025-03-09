@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pineapple/api/api_service.dart';
 import 'package:pineapple/firebase/auth_service.dart';
 import 'package:pineapple/model/UserModel.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -21,6 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<List<Map<String, dynamic>>?>? _tasksFuture;
 
   int userPoints = 0;
+
+   final AudioPlayer _audioPlayer = AudioPlayer();
+
+  void _playSound() async {
+    await _audioPlayer.play(AssetSource('assets/sounds/sound-1.mp3')); // Correct path
+  }
 
 
   @override
@@ -116,8 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             task["isCompleted"] = value!;
                             if(value == true){
                               userPoints = userPoints + 10;
+                              _playSound();
                             } else {
                               userPoints = userPoints - 10;
+                              _playSound();
                             }
                             
                           });

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
@@ -11,11 +9,11 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   // Dummy User Data with Rankings
-  final List<String> _userImages = [
-    "assets/imgs/img-1.png", // 🥇 First Place
-    "assets/imgs/img-2.png", // 🥈 Second Place,
-    "assets/imgs/img-3.png", // 🥉 Third Place
-    "assets/imgs/img-4.png",
+  final List<Map<String, String>> _users = [
+    {"name": "Carol", "image": "assets/imgs/img-1.png"},
+    {"name": "Alina", "image": "assets/imgs/img-2.png"},
+    {"name": "Isabel", "image": "assets/imgs/img-3.png"},
+    {"name": "Chaewon", "image": "assets/imgs/img-4.png"},
   ];
 
   // Dummy Prize Data
@@ -29,9 +27,12 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Background Color
       appBar: AppBar(
-        title: Text('Game Rankings'),
+        title: Text(
+          'Game Rankings 🏆',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -42,13 +43,11 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
-              color: Color(0xFF76B3D0),
+              color: Color(0xffB3CAF4), // Light Blue
               elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Row(
                   children: [
                     CircleAvatar(
@@ -57,17 +56,13 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     SizedBox(width: 16),
                     Text(
-                      'Hey, User!',
+                      'Hey, Carol!',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     Spacer(),
                     Text(
                       'Points: 53 XP',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -82,68 +77,75 @@ class _GameScreenState extends State<GameScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: Color(0xFFFFA679), // 💖 Pink Background
+                color: Color(0xFFFFA679), // Warm Peach Background
                 borderRadius: BorderRadius.circular(20),
               ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: List.generate(_userImages.length, (index) {
+                  children: List.generate(_users.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Stack(
-                        alignment: Alignment.center,
+                      child: Column(
                         children: [
-                          // 🔹 First Place Special Frame (Yellow + Blue)
-                          if (index == 0)
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.yellow, // Outer Yellow Frame
-                                  width: 8,
-                                ),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.all(3), // Inner blue frame
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.blue, // Inner Blue Frame
-                                    width: 3,
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // 🔹 Special Frame for First Place 🏆
+                              if (index == 0)
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.yellow, // Outer Yellow Frame
+                                      width: 8,
+                                    ),
                                   ),
-                                ),
-                                child: CircleAvatar(
-                                  backgroundImage: AssetImage(_userImages[index]),
+                                  child: Container(
+                                    padding: EdgeInsets.all(3), // Inner blue frame
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.blue, // Inner Blue Frame
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: CircleAvatar(
+                                      backgroundImage: AssetImage(_users[index]["image"]!),
+                                      radius: 35,
+                                    ),
+                                  ),
+                                )
+                              else
+                                CircleAvatar(
+                                  backgroundImage: AssetImage(_users[index]["image"]!),
                                   radius: 35,
                                 ),
-                              ),
-                            )
-                          else
-                            CircleAvatar(
-                              backgroundImage: AssetImage(_userImages[index]),
-                              radius: 35,
-                            ),
 
-                          // 🔹 Rank Indicator (Number Badge)
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                                border: Border.all(color: Colors.black, width: 1),
-                              ),
-                              child: Text(
-                                "${index + 1}", // Ranks (1,2,3...)
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                              // 🔹 Rank Indicator (Number Badge)
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                    border: Border.all(color: Colors.black, width: 1),
+                                  ),
+                                  child: Text(
+                                    "${index + 1}", // Ranks (1,2,3...)
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          // 🔹 User Name Display
+                          Text(
+                            _users[index]["name"]!,
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
                           ),
                         ],
                       ),
@@ -154,6 +156,8 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
 
+          SizedBox(height: 20),
+
           // 🔹 Sweet Treat Title
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -162,13 +166,7 @@ class _GameScreenState extends State<GameScreen> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Text('Days Left: 7 Days'),
-              ),
-          ),
+
           // 🔹 Prize Grid (2x2)
           Expanded(
             child: Padding(
@@ -187,12 +185,11 @@ class _GameScreenState extends State<GameScreen> {
                   return Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Color(0xFFEBD7D7),
+                      color: Color(0xFFEBD7D7), // Soft Pink
                       borderRadius: BorderRadius.circular(15),
-                      // border: Border.all(color: Colors.pinkAccent, width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xFFEBD7D7),
+                          color: Colors.black12,
                           blurRadius: 5,
                           spreadRadius: 2,
                         ),
@@ -207,6 +204,10 @@ class _GameScreenState extends State<GameScreen> {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         SizedBox(height: 5),
+                        Text(
+                          _prizes[index]["daysLeft"]!,
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                       ],
                     ),
                   );

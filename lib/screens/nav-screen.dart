@@ -48,7 +48,7 @@ class _NavigationState extends State<Navigation> {
           ),
           BottomNavigationBarItem(
             icon: _buildNavIcon(Icons.gamepad, 1),
-            label: 'Game',
+            label: 'Game Stats',
           ),
           BottomNavigationBarItem(
             icon: _buildNavIcon(Icons.home, 2),

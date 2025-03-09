@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pineapple/api/api_service.dart';
 import 'package:pineapple/screens/create-room-screen.dart';
@@ -13,7 +14,46 @@ import 'package:pineapple/screens/sign-up-screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
+
+    // ✅ Handle background messages
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(MyApp());
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("💬 Message received in background: ${message.notification?.title}");
+}
+
+
+void requestNotificationPermission() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print("✅ Notifications Allowed");
+  } else {
+    print("❌ Notifications Denied");
+  }
+}
+
+void getToken() async {
+  String? token = await FirebaseMessaging.instance.getToken();
+  print("🔥 FCM Token: $token");
+}
+  
+void setupFirebaseListeners() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("📩 New notification: ${message.notification?.title}");
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print("🔄 App opened by clicking the notification!");
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -21,8 +61,13 @@ class MyApp extends StatelessWidget {
 
   MyApp({super.key});
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
+    getToken();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthCheck(apiService: apiService), // Pass API service
