@@ -21,7 +21,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     const firebaseUser = await admin.auth().getUser(uid);
     const {uid: firebaseUid, email, displayName: name} = firebaseUser;
-    console.log("Firebase user:", firebaseUser);
+
     // Check if user exists in MongoDB, else create one
     let user: IUser | null = await User.findOne({firebaseUid: firebaseUid});
     console.log("User:", user);

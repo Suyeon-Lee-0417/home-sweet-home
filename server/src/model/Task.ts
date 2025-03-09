@@ -46,7 +46,7 @@ const TaskSchema: Schema = new Schema(
     teamId: {type: Schema.Types.ObjectId, ref: "Team", required: true},
     dueDate: {type: Date, required: true},
     points: {type: Number, required: true},
-    priority: {type: String, enum: ["low", "medium", "high"], default: "medium"},
+    priority: {type: String, enum: ["Low", "Medium", "High"], default: "Medium"},
     recurrence: {type: RecurrenceSchema}
   },
   {timestamps: true}
