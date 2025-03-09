@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import {connectDB} from "./utils/DBconnection";
 import authRouter from "./routes/auth";
+import teamRoute from "./routes/team";
 
 dotenv.config();
 
@@ -19,5 +20,6 @@ app.get(`${endpoint}/`, (req, res) => {
 });
 
 app.use(`${endpoint}/auth`, authRouter);
+app.use(`${endpoint}/teams`, teamRoute);
 
 export default app;

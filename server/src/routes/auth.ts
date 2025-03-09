@@ -1,7 +1,5 @@
-// src/routes/auth.ts
 import {Router, Request, Response} from "express";
 import admin from "../config/firebase";
-import jwt from "jsonwebtoken";
 import User, {IUser} from "../model/User";
 import dotenv from "dotenv";
 dotenv.config();
@@ -13,7 +11,7 @@ router.post("/", async (req: Request, res: Response) => {
   const {uid} = req.body;
 
   if (!uid) {
-    return res.status(400).json({message: "ID token is required."});
+    return res.status(400).json({message: "User ID is required."});
   }
 
   try {

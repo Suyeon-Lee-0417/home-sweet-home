@@ -10,10 +10,11 @@ export interface IRecurrence {
 export interface ITask extends Document {
   title: string;
   description: string;
-  status: "pending" | "completed" | "not started";
+  isCompleted: boolean;
   assignedTo: Schema.Types.ObjectId;
   createdBy: Schema.Types.ObjectId;
   teamId: Schema.Types.ObjectId;
+  category: string;
   dueDate: Date;
   points: number;
   recurrence?: IRecurrence;
@@ -37,13 +38,10 @@ const TaskSchema: Schema = new Schema(
   {
     title: {type: String, required: true},
     description: {type: String},
-    status: {
-      type: String,
-      enum: ["pending", "completed", "not started"],
-      default: "pending"
-    },
+    isCompleted: {type: Boolean, default: false},
     assignedTo: {type: Schema.Types.ObjectId, ref: "User", required: true},
     createdBy: {type: Schema.Types.ObjectId, ref: "User", required: true},
+    category: {type: String, required: true},
     teamId: {type: Schema.Types.ObjectId, ref: "Team", required: true},
     dueDate: {type: Date, required: true},
     points: {type: Number, required: true},
