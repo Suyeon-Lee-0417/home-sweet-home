@@ -17,8 +17,8 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
 
   // Dummy User Data
   final Map<String, dynamic> _currentUser = {
-    "name": "John Doe",
-    "profilePic": "https://randomuser.me/api/portraits/men/1.jpg"
+    "name": "Sydney",
+    "profilePic": "assets/imgs/img-3.png",
   };
 
   // Function to Toggle Checkbox
@@ -220,7 +220,7 @@ class _GroceriesScreenState extends State<GroceriesScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundImage: NetworkImage(checkedBy["profilePic"]),
+                                  backgroundImage: AssetImage(checkedBy["profilePic"]),
                                 ),
                                 SizedBox(height: 4),
                                 Text(
