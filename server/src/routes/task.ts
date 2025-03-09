@@ -84,11 +84,7 @@ router.get("/:uid", async (req: Request, res: Response) => {
 
     // Query tasks due today
     const tasks = await Task.find({
-      assignedTo: user._id,
-      dueDate: {
-        $gte: startOfDay,
-        $lte: endOfDay
-      }
+      assignedTo: user._id
     });
 
     res.json({tasks});
