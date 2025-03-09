@@ -65,12 +65,12 @@ class _HomeScreenState extends State<HomeScreen> {
               future: _userFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return _buildUserCard("Loading...", "Loading...");
+                  return buildUserCard("Loading...", "Loading...");
                 } else if (snapshot.hasError || !snapshot.hasData) {
-                  return _buildUserCard("Guest", "0 XP");
+                  return buildUserCard("Guest", "0 XP");
                 } else {
                   final user = snapshot.data!;
-                  return _buildUserCard("${user.firstName} ${user.lastName}", "${user.points} XP");
+                  return buildUserCard("${user.firstName} ${user.lastName}", "${user.points} XP");
                 }
               },
             ),
@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ✅ Build User Info Card
-  Widget _buildUserCard(String userName, String points) {
+  Widget buildUserCard(String userName, String points) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

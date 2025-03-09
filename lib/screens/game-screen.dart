@@ -12,11 +12,10 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   // Dummy User Data with Rankings
   final List<String> _userImages = [
-    "assets/imgs/pic.jpeg", // 🥇 First Place
-    "assets/imgs/pic.jpeg", // 🥈 Second Place
-    "assets/imgs/pic.jpeg", // 🥉 Third Place
-    "assets/imgs/pic.jpeg",
-    "assets/imgs/pic.jpeg",
+    "assets/imgs/img-1.png", // 🥇 First Place
+    "assets/imgs/img-2.png", // 🥈 Second Place,
+    "assets/imgs/img-3.png", // 🥉 Third Place
+    "assets/imgs/img-4.png",
   ];
 
   // Dummy Prize Data
