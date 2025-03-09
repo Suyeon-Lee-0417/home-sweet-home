@@ -8,10 +8,10 @@ const router = Router();
 
 // POST /api/auth
 router.post("/", async (req: Request, res: Response) => {
-  const {uid} = req.body;
+  const {uid, firstname, lastname} = req.body;
 
-  if (!uid) {
-    return res.status(400).json({message: "User ID is required."});
+  if (!uid || !firstname || !lastname) {
+    return res.status(400).json({message: "UID, first name, and last name are required"});
   }
 
   try {
@@ -21,13 +21,16 @@ router.post("/", async (req: Request, res: Response) => {
 
     const firebaseUser = await admin.auth().getUser(uid);
     const {uid: firebaseUid, email, displayName: name} = firebaseUser;
-
+    console.log("Firebase user:", firebaseUser);
     // Check if user exists in MongoDB, else create one
     let user: IUser | null = await User.findOne({firebaseUid: firebaseUid});
+    console.log("User:", user);
     if (!user) {
       user = new User({
         firebaseUid: firebaseUid,
         email: email,
+        firstName: firstname,
+        lastName: lastname,
         displayName: name || ""
       });
       await user.save();

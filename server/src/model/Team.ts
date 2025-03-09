@@ -2,8 +2,8 @@ import mongoose, {Document, Schema} from "mongoose";
 
 export interface ITeam extends Document {
   name: string;
-  memberIds: [Schema.Types.ObjectId]; // List of user IDs
-  tasksIds: [Schema.Types.ObjectId]; // List of task IDs
+  memberIds: Schema.Types.ObjectId[]; // List of user IDs
+  tasksIds: Schema.Types.ObjectId[]; // List of task IDs
   adminId: string; // User ID of the admin
 }
 
