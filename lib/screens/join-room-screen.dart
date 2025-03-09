@@ -25,7 +25,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
       print("Joining Room: $roomName");
 
       // TODO: Implement API call to join the room
-      Navigator.pushNamed(context, '/room-joined', arguments: roomName);
+      Navigator.pushReplacementNamed(context, '/room-joined', arguments: roomName);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Joining Room: $roomName")),

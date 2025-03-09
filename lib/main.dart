@@ -77,11 +77,11 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
        '/create-room': (context) => CreateRoomScreen(),
        '/join-room': (context) => JoinRoomScreen(),
-       
       },
+      
         onGenerateRoute: (settings) {
         if (settings.name == '/room-joined') {
-          final args = settings.arguments as String;
+          final args = settings.arguments as Future<String?>;
 
           return MaterialPageRoute(
             builder: (context) => RoomJoinedScreen(roomName: args),
