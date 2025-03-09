@@ -111,4 +111,19 @@ router.post("/join", async (req: Request, res: Response) => {
   }
 });
 
+// get all users in a team
+// GET /api/teams/:id/users
+router.get("/:id/users", async (req: Request, res: Response) => {
+  try {
+    // TODO: protect this route with authentication
+
+    const team = await Team.findById(req.params.id).populate("memberIds");
+    if (!team) return res.status(404).json({message: "Team not found"});
+    res.json({users: team.memberIds});
+  } catch (error) {
+    console.error("Error getting users:", error);
+    res.status(500).json({message: "Error getting users"});
+  }
+});
+
 export default router;

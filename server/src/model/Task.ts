@@ -11,12 +11,13 @@ export interface ITask extends Document {
   title: string;
   description: string;
   isCompleted: boolean;
-  assignedTo: Schema.Types.ObjectId;
+  assignedTo?: Schema.Types.ObjectId;
   createdBy: Schema.Types.ObjectId;
   teamId: Schema.Types.ObjectId;
   category: string;
   dueDate: Date;
   points: number;
+  priority: string;
   recurrence?: IRecurrence;
 }
 
@@ -39,12 +40,13 @@ const TaskSchema: Schema = new Schema(
     title: {type: String, required: true},
     description: {type: String},
     isCompleted: {type: Boolean, default: false},
-    assignedTo: {type: Schema.Types.ObjectId, ref: "User", required: true},
+    assignedTo: {type: Schema.Types.ObjectId, ref: "User"},
     createdBy: {type: Schema.Types.ObjectId, ref: "User", required: true},
     category: {type: String, required: true},
     teamId: {type: Schema.Types.ObjectId, ref: "Team", required: true},
     dueDate: {type: Date, required: true},
     points: {type: Number, required: true},
+    priority: {type: String, enum: ["low", "medium", "high"], default: "medium"},
     recurrence: {type: RecurrenceSchema}
   },
   {timestamps: true}
