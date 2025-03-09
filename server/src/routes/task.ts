@@ -64,12 +64,33 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 /**
- * Get all tasks.
- * GET /api/tasks
+ * Get all tasks for current user due today.
+ * GET /api/tasks/:uid
  */
-router.get("/", async (req: Request, res: Response) => {
+router.get("/:uid", async (req: Request, res: Response) => {
   try {
-    const tasks = await Task.find();
+    const {uid} = req.params;
+    if (!uid) return res.status(400).json({message: "User ID is required"});
+
+    const user = await User.findOne({firebaseUid: uid});
+    if (!user) return res.status(404).json({message: "User not found"});
+
+    // Calculate the start and end of the current day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Query tasks due today
+    const tasks = await Task.find({
+      assignedTo: user._id,
+      dueDate: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      }
+    });
+
     res.json({tasks});
   } catch (error) {
     console.error("Error fetching tasks:", error);
